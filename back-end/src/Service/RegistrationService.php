@@ -13,15 +13,18 @@ class RegistrationService
     private $em;
     private $passwordHasher;
     private $positionService;
+    private $emailService;
 
     public function __construct(
         EntityManagerInterface $em,
         UserPasswordHasherInterface $passwordHasher,
-        PositionService $positionService
+        PositionService $positionService,
+        EmailService $emailService
     ) {
         $this->em = $em;
         $this->passwordHasher = $passwordHasher;
         $this->positionService = $positionService;
+        $this->emailService = $emailService;
     }
 
     public function register(array $data): array
@@ -49,6 +52,10 @@ class RegistrationService
             $this->em->flush();
 
             $this->em->commit();
+
+            // Enviar correo de bienvenida
+            $this->emailService->sendWelcomeEmail($user->getEmail(), $employee->getName());
+
             return ['status' => 201, 'message' => 'Usuario y empleado registrados con éxito'];
         } catch (\Exception $e) {
             $this->em->rollback();

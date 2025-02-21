@@ -11,13 +11,18 @@ use App\Service\RegistrationService;
 #[Route('/api', name: 'api_')]
 class AuthController extends AbstractController
 {
+    private $registrationService;
+
+    public function __construct(RegistrationService $registrationService)
+    {
+        $this->registrationService = $registrationService;
+    }
+
     #[Route('/register', name: 'register', methods: ['POST'])]
-    public function register(
-        Request $request,
-        RegistrationService $registrationService
-    ): JsonResponse {
+    public function register(Request $request): JsonResponse
+    {
         $data = json_decode($request->getContent(), true);
-        $result = $registrationService->register($data);
+        $result = $this->registrationService->register($data);
 
         return new JsonResponse(['message' => $result['message']], $result['status']);
     }
