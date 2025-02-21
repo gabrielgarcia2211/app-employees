@@ -112,4 +112,25 @@ class EmployeeController extends AbstractController
             return $this->json(['error' => $e->getMessage()], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    #[Route('/employees/{id}', name: 'delete_employee', methods: ['DELETE'])]
+    public function deleteEmployee(
+        int $id,
+        EmployeeRepository $employeeRepository,
+        EmployeeService $employeeService
+    ): JsonResponse {
+        try {
+            $employee = $employeeRepository->find($id);
+            if (!$employee) {
+                return $this->json(['error' => 'Empleado no encontrado'], JsonResponse::HTTP_NOT_FOUND);
+            }
+            if (!$this->isGranted('ROLE_ADMIN') && $employee->getUser()->getId() !== $this->getUser()->getId()) {
+                return $this->json(['error' => 'No tienes permiso para eliminar este empleado'], JsonResponse::HTTP_FORBIDDEN);
+            }
+            $employeeService->deleteEmployee($employee);
+            return $this->json(['message' => 'Empleado eliminado correctamente']);
+        } catch (\Exception $e) {
+            return $this->json(['error' => $e->getMessage()], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 }

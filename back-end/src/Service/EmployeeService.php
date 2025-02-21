@@ -61,6 +61,12 @@ class EmployeeService
         $this->entityManager->flush();
     }
 
+    public function deleteEmployee(Employee $employee): void
+    {
+        $this->entityManager->remove($employee);
+        $this->entityManager->flush();
+    }
+
     private function isValidEmployeeData(array $data): bool
     {
         return isset($data['name'], $data['lastname'], $data['position'], $data['birthdate']) &&
