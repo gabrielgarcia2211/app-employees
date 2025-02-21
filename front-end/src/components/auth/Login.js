@@ -1,13 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import { login } from "../../api/authService";
-import { Link } from "react-router-dom"; // Importar Link de react-router-dom
+import { Link } from "react-router-dom";
 import "../../styles/login.css";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (localStorage.getItem("token")) {
+      window.location.href = "/dashboard";
+    }
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
