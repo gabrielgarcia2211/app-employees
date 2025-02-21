@@ -7,6 +7,7 @@ use App\Entity\Employee;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use App\Service\PositionService;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class RegistrationService
 {
@@ -27,18 +28,18 @@ class RegistrationService
         $this->emailService = $emailService;
     }
 
-    public function register(array $data): array
+    public function register(array $data): JsonResponse
     {
         if (!$this->isValidRegistrationData($data)) {
-            return ['status' => 400, 'message' => 'Datos incompletos'];
+            return new JsonResponse(['error' => 'Datos incompletos'], JsonResponse::HTTP_BAD_REQUEST);
         }
 
         if ($this->userExists($data['email'])) {
-            return ['status' => 400, 'message' => 'El usuario ya existe'];
+            return new JsonResponse(['error' => 'El usuario ya existe'], JsonResponse::HTTP_BAD_REQUEST);
         }
 
         if (!$this->positionService->isValidPosition($data['position'])) {
-            return ['status' => 400, 'message' => 'Posición no válida'];
+            return new JsonResponse(['error' => 'Posición no válida'], JsonResponse::HTTP_BAD_REQUEST);
         }
 
         $this->em->beginTransaction();
@@ -56,10 +57,10 @@ class RegistrationService
             // Enviar correo de bienvenida
             $this->emailService->sendWelcomeEmail($user->getEmail(), $employee->getName());
 
-            return ['status' => 201, 'message' => 'Usuario y empleado registrados con éxito'];
+            return new JsonResponse(['message' => 'Usuario y empleado registrados con éxito'], JsonResponse::HTTP_CREATED);
         } catch (\Exception $e) {
             $this->em->rollback();
-            return ['status' => 500, 'message' => 'Error al registrar usuario y empleado'];
+            return new JsonResponse(['message' => 'Error al registrar usuario y empleado'], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
