@@ -22,8 +22,6 @@ class AuthController extends AbstractController
     public function register(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
-        $result = $this->registrationService->register($data);
-
-        return new JsonResponse(['message' => $result['message']], $result['status']);
+        return $this->registrationService->register($data);
     }
 }

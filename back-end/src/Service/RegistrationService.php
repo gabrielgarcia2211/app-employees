@@ -91,7 +91,9 @@ class RegistrationService
         $employee->setName($data['name']);
         $employee->setLastname($data['lastname']);
         $employee->setPosition($data['position']);
-        $employee->setBirthdate(new \DateTime($data['birthdate']));
+        if(isset($data['birthdate'])){
+            $employee->setBirthdate(new \DateTime($data['birthdate']));
+        }
         return $employee;
     }
 }

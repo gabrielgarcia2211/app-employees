@@ -45,26 +45,94 @@ class EmployeeService
         return new JsonResponse(['message' => 'Empleado registrado con éxito'], JsonResponse::HTTP_CREATED);
     }
 
-    public function updateEmployeeName(Employee $employee, string $newName): void
+    public function getEmployees(?string $name): JsonResponse
     {
-        $employee->setName($newName);
-        $this->entityManager->flush();
-    }
+        $employees = $name ? $this->employeeRepository->searchByName($name) : $this->employeeRepository->findAll();
 
-    public function updateEmployeePosition(Employee $employee, string $newPosition): void
-    {
-        if (!$this->positionService->isValidPosition($newPosition)) {
-            throw new \InvalidArgumentException('Puesto de trabajo no válido');
+        if (empty($employees)) {
+            return new JsonResponse(['message' => 'No se encontraron empleados'], JsonResponse::HTTP_NOT_FOUND);
         }
 
-        $employee->setPosition($newPosition);
-        $this->entityManager->flush();
+        $data = array_map(fn($employee) => [
+            'id' => $employee->getId(),
+            'name' => $employee->getName(),
+            'lastname' => $employee->getLastname(),
+            'position' => $employee->getPosition(),
+            'email' => $employee->getUser()->getEmail()
+        ], $employees);
+
+        return new JsonResponse($data);
     }
 
-    public function deleteEmployee(Employee $employee): void
+    public function getPositions(PositionService $positionService): JsonResponse
     {
-        $this->entityManager->remove($employee);
-        $this->entityManager->flush();
+        try {
+            $positions = $positionService->getPositions();
+            return new JsonResponse($positions);
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => $e->getMessage()], JsonResponse::HTTP_BAD_REQUEST);
+        }
+    }
+
+    public function editEmployeeName(int $id, string $newName): JsonResponse
+    {
+        if (!$newName) {
+            return new JsonResponse(['error' => 'El nombre es requerido'], JsonResponse::HTTP_BAD_REQUEST);
+        }
+        try {
+            $employee = $this->employeeRepository->find($id);
+            if (!$employee) {
+                return new JsonResponse(['error' => 'Empleado no encontrado'], JsonResponse::HTTP_NOT_FOUND);
+            }
+            $employee->setName($newName);
+            $this->entityManager->flush();
+            return new JsonResponse(['message' => 'Nombre del empleado actualizado correctamente']);
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => $e->getMessage()], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function editEmployeePosition(int $id, string $newPosition, $currentUser): JsonResponse
+    {
+        if (!$newPosition) {
+            return new JsonResponse(['error' => 'El puesto de trabajo es requerido'], JsonResponse::HTTP_BAD_REQUEST);
+        }
+
+        try {
+            $employee = $this->employeeRepository->find($id);
+            if (!$employee) {
+                return new JsonResponse(['error' => 'Empleado no encontrado'], JsonResponse::HTTP_NOT_FOUND);
+            }
+            if ($employee->getUser() === null || $employee->getUser()->getId() !== $currentUser->getId()) {
+                return new JsonResponse(['error' => 'No tienes permiso para modificar este empleado'], JsonResponse::HTTP_FORBIDDEN);
+            }
+            if (!$this->positionService->isValidPosition($newPosition)) {
+                throw new \InvalidArgumentException('Puesto de trabajo no válido');
+            }
+            $employee->setPosition($newPosition);
+            $this->entityManager->flush();
+            return new JsonResponse(['message' => 'Puesto de trabajo del empleado actualizado correctamente']);
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => $e->getMessage()], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function deleteEmployee(int $id, $currentUser): JsonResponse
+    {
+        try {
+            $employee = $this->employeeRepository->find($id);
+            if (!$employee) {
+                return new JsonResponse(['error' => 'Empleado no encontrado'], JsonResponse::HTTP_NOT_FOUND);
+            }
+            if (!$currentUser->isGranted('ROLE_ADMIN') && $employee->getUser()->getId() !== $currentUser->getId()) {
+                return new JsonResponse(['error' => 'No tienes permiso para eliminar este empleado'], JsonResponse::HTTP_FORBIDDEN);
+            }
+            $this->entityManager->remove($employee);
+            $this->entityManager->flush();
+            return new JsonResponse(['message' => 'Empleado eliminado correctamente']);
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => $e->getMessage()], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     private function isValidEmployeeData(array $data): bool
