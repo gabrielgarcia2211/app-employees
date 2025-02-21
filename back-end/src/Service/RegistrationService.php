@@ -66,7 +66,8 @@ class RegistrationService
 
     private function isValidRegistrationData(?array $data): bool
     {
-        return isset($data['email'], $data['password'], $data['name'], $data['lastname'], $data['position']);
+        return isset($data['email'], $data['password'], $data['name'], $data['lastname'], $data['position']) &&
+               !empty($data['email']) && !empty($data['password']) && !empty($data['name']) && !empty($data['lastname']) && !empty($data['position']);
     }
 
     private function userExists(string $email): bool

@@ -14,12 +14,10 @@ use App\Service\EmployeeService;
 #[Route('/api', name: 'api_')]
 class EmployeeController extends AbstractController
 {
-    private EmployeeRepository $employeeRepository;
     private EmployeeService $employeeService;
 
-    public function __construct(EmployeeRepository $employeeRepository, EmployeeService $employeeService)
+    public function __construct(EmployeeService $employeeService)
     {
-        $this->employeeRepository = $employeeRepository;
         $this->employeeService = $employeeService;
     }
 
@@ -29,13 +27,6 @@ class EmployeeController extends AbstractController
     {
         $name = $request->query->get('name');
         return $this->employeeService->getEmployees($name);
-    }
-
-    #[Route('/positions', name: 'get_positions', methods: ['GET'])]
-    #[IsGranted('ROLE_ADMIN')]
-    public function getPositions(PositionService $positionService): JsonResponse
-    {
-        return $this->employeeService->getPositions($positionService);
     }
 
     #[Route('/employees', name: 'register_employee', methods: ['POST'])]

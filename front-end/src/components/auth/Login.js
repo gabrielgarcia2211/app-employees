@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import Swal from "sweetalert2";
-import { login } from "../../services/authService";
-import "./login.css";
+import { login } from "../../api/authService";
+import { Link } from "react-router-dom"; // Importar Link de react-router-dom
+import "../../styles/login.css";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -60,6 +61,11 @@ const Login = () => {
           Iniciar Sesión
         </button>
       </form>
+      <div className="mt-3">
+        <Link to="/register" className="btn btn-secondary w-100">
+          Registrarse
+        </Link>
+      </div>
     </div>
   );
 };
