@@ -2,17 +2,14 @@
 
 namespace App\Controller;
 
-use App\Entity\Employee;
 use App\Service\PositionService;
 use App\Repository\EmployeeRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use App\Repository\UserRepository;
-
+use App\Service\EmployeeService;
 
 #[Route('/api', name: 'api_')]
 class EmployeeController extends AbstractController
@@ -22,28 +19,19 @@ class EmployeeController extends AbstractController
     public function getEmployees(Request $request, EmployeeRepository $employeeRepository): JsonResponse
     {
         $name = $request->query->get('name');
-
-        if ($name) {
-            $employees = $employeeRepository->searchByName($name);
-        } else {
-            $employees = $employeeRepository->findAll();
-        }
+        $employees = $name ? $employeeRepository->searchByName($name) : $employeeRepository->findAll();
 
         if (empty($employees)) {
             return $this->json(['message' => 'No se encontraron empleados'], JsonResponse::HTTP_NOT_FOUND);
         }
 
-        $data = [];
-
-        foreach ($employees as $employee) {
-            $data[] = [
-                'id' => $employee->getId(),
-                'name' => $employee->getName(),
-                'lastname' => $employee->getLastname(),
-                'position' => $employee->getPosition(),
-                'email' => $employee->getUser()->getEmail()
-            ];
-        }
+        $data = array_map(fn($employee) => [
+            'id' => $employee->getId(),
+            'name' => $employee->getName(),
+            'lastname' => $employee->getLastname(),
+            'position' => $employee->getPosition(),
+            'email' => $employee->getUser()->getEmail()
+        ], $employees);
 
         return $this->json($data);
     }
@@ -61,49 +49,67 @@ class EmployeeController extends AbstractController
     }
 
     #[Route('/employees', name: 'register_employee', methods: ['POST'])]
-    #[IsGranted('ROLE_ADMIN')]
     public function registerEmployee(
         Request $request,
-        PositionService $positionService,
-        EntityManagerInterface $entityManager,
-        UserRepository $userRepository,
-        EmployeeRepository $employeeRepository
+        EmployeeService $employeeService
     ): JsonResponse {
         $data = json_decode($request->getContent(), true);
+        return $employeeService->registerEmployee($data, $this->getUser());
+    }
 
-        if (!isset($data['name'], $data['lastname'], $data['position'], $data['birthdate'])) {
-            return $this->json(['error' => 'Datos incompletos'], JsonResponse::HTTP_BAD_REQUEST);
+    #[Route('/employees/{id}/name', name: 'edit_employee_name', methods: ['PUT'])]
+    #[IsGranted('ROLE_ADMIN')]
+    public function editEmployeeName(
+        int $id,
+        Request $request,
+        EmployeeRepository $employeeRepository,
+        EmployeeService $employeeService
+    ): JsonResponse {
+        $data = json_decode($request->getContent(), true);
+        $newName = $data['name'] ?? null;
+        if (!$newName) {
+            return $this->json(['error' => 'El nombre es requerido'], JsonResponse::HTTP_BAD_REQUEST);
         }
-
-        if (!$positionService->isValidPosition($data['position'])) {
-            return $this->json(['error' => 'Puesto de trabajo no válido'], JsonResponse::HTTP_BAD_REQUEST);
-        }
-
-        if (isset($data['user_id'])) {
-            $user = $userRepository->find($data['user_id']);
-            if (!$user || !$user->hasRole('ROLE_USER')) {
-                return $this->json(['error' => 'Usuario no válido o no tiene el rol adecuado'], JsonResponse::HTTP_BAD_REQUEST);
+        try {
+            $employee = $employeeRepository->find($id);
+            if (!$employee) {
+                return $this->json(['error' => 'Empleado no encontrado'], JsonResponse::HTTP_NOT_FOUND);
             }
 
-            $existingEmployee = $employeeRepository->findOneBy(['user' => $user]);
-            if ($existingEmployee) {
-                return $this->json(['error' => 'El usuario ya está asignado a otro empleado'], JsonResponse::HTTP_BAD_REQUEST);
+            $employeeService->updateEmployeeName($employee, $newName);
+            return $this->json(['message' => 'Nombre del empleado actualizado correctamente']);
+        } catch (\Exception $e) {
+            return $this->json(['error' => $e->getMessage()], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    #[Route('/employees/{id}/position', name: 'edit_employee_position', methods: ['PUT'])]
+    #[IsGranted('ROLE_USER')]
+    public function editEmployeePosition(
+        int $id,
+        Request $request,
+        EmployeeRepository $employeeRepository,
+        EmployeeService $employeeService
+    ): JsonResponse {
+        $data = json_decode($request->getContent(), true);
+        $newPosition = $data['position'] ?? null;
+
+        if (!$newPosition) {
+            return $this->json(['error' => 'El puesto de trabajo es requerido'], JsonResponse::HTTP_BAD_REQUEST);
+        }
+
+        try {
+            $employee = $employeeRepository->find($id);
+            if (!$employee) {
+                return $this->json(['error' => 'Empleado no encontrado'], JsonResponse::HTTP_NOT_FOUND);
             }
+            if ($employee->getUser()->getId() !== $this->getUser()->getId()) {
+                return $this->json(['error' => 'No tienes permiso para modificar este empleado'], JsonResponse::HTTP_FORBIDDEN);
+            }
+            $employeeService->updateEmployeePosition($employee, $newPosition);
+            return $this->json(['message' => 'Puesto de trabajo del empleado actualizado correctamente']);
+        } catch (\Exception $e) {
+            return $this->json(['error' => $e->getMessage()], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
-
-        $employee = new Employee();
-        $employee->setName($data['name']);
-        $employee->setLastname($data['lastname']);
-        $employee->setPosition($data['position']);
-        $employee->setBirthdate(new \DateTime($data['birthdate']));
-
-        if (isset($user)) {
-            $employee->setUser($user);
-        }
-
-        $entityManager->persist($employee);
-        $entityManager->flush();
-
-        return $this->json(['message' => 'Empleado registrado con éxito'], JsonResponse::HTTP_CREATED);
     }
 }

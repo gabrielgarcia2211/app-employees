@@ -107,4 +107,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return in_array($role, $this->getRoles());
     }
+
+    public function isGranted(string $role): bool
+    {
+        return $this->hasRole($role);
+    }
 }
