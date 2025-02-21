@@ -1,0 +1,32 @@
+.logo-img {
+  width: 120px;
+  margin: 10px auto;
+  display: block;
+}
+
+.container {
+  background-color: #f8f9fa;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.card {
+  border: none;
+  border-radius: 10px;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+.form-label {
+  font-weight: bold;
+}
+
+.form-control {
+  border-radius: 5px;
+}
+
+.alert-danger {
+  border-radius: 5px;
+}
