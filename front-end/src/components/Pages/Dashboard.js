@@ -3,6 +3,8 @@ import { getEmployees, addEmployee } from "../../api/employeService";
 import { getUsers } from "../../api/userService";
 import { getPositions } from "../../api/positionService";
 import { handleError } from "../../utils/errorHandler";
+import EmployeeList from "../Employee/EmployeeList";
+import AddEmployeeForm from "../Employee/AddEmployeeForm";
 
 const Dashboard = () => {
   const [employees, setEmployees] = useState([]);
@@ -17,21 +19,20 @@ const Dashboard = () => {
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState("");
   const [positions, setPositions] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const fetchEmployees = async (search = null) => {
+    try {
+      const response = await getEmployees(search);
+      setEmployees(response);
+    } catch (error) {
+      setEmployees([]);
+      const errorMessage = handleError(error, "Error al registrar el usuario");
+      setError(errorMessage);
+    }
+  };
 
   useEffect(() => {
-    const fetchEmployees = async () => {
-      try {
-        const response = await getEmployees();
-        setEmployees(response);
-      } catch (error) {
-        const errorMessage = handleError(
-          error,
-          "Error al registrar el usuario"
-        );
-        setError(errorMessage);
-      }
-    };
-
     const fetchUsers = async () => {
       try {
         const response = await getUsers();
@@ -59,8 +60,8 @@ const Dashboard = () => {
     };
 
     fetchEmployees();
-    fetchUsers();
     fetchPositions();
+    fetchUsers();
   }, []);
 
   const handleInputChange = (e) => {
@@ -73,15 +74,23 @@ const Dashboard = () => {
   };
 
   const handleAddEmployee = async () => {
+    setError("");
+    setLoading(true);
     try {
-      await addEmployee({ ...newEmployee, userId: selectedUser });
+      await addEmployee({ ...newEmployee, user_id: selectedUser });
       setEmployees([...employees, newEmployee]);
       setNewEmployee({ name: "", lastname: "", position: "", birthdate: "" });
       setView("list");
     } catch (error) {
       const errorMessage = handleError(error, "Error al añadir el empleado");
       setError(errorMessage);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const handleSearch = async (search) => {
+    fetchEmployees(search);
   };
 
   return (
@@ -97,89 +106,19 @@ const Dashboard = () => {
             {view === "list" ? "Añadir Empleado" : "Ver Lista de Empleados"}
           </button>
           {view === "list" ? (
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>Nombre</th>
-                  <th>Apellido</th>
-                  <th>Posición</th>
-                  <th>Fecha de Nacimiento</th>
-                </tr>
-              </thead>
-              <tbody>
-                {Array.isArray(employees) &&
-                  employees.map((employee) => (
-                    <tr key={employee.id}>
-                      <td>{employee.name}</td>
-                      <td>{employee.lastname}</td>
-                      <td>{employee.position}</td>
-                      <td>{employee.birthdate}</td>
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
+            <EmployeeList employees={employees} onSearch={handleSearch} />
           ) : (
-            <div className="mt-4">
-              <h5>Añadir Empleado</h5>
-              <div className="form-group">
-                <select
-                  className="form-control mb-2"
-                  value={selectedUser}
-                  onChange={handleUserChange}
-                >
-                  <option value="">Seleccionar Usuario</option>
-                  {users.map((user) => (
-                    <option key={user.id} value={user.id}>
-                      {user.email}
-                    </option>
-                  ))}
-                </select>
-                <input
-                  type="text"
-                  name="name"
-                  className="form-control mb-2"
-                  placeholder="Nombre"
-                  value={newEmployee.name}
-                  onChange={handleInputChange}
-                />
-                <input
-                  type="text"
-                  name="lastname"
-                  className="form-control mb-2"
-                  placeholder="Apellido"
-                  value={newEmployee.lastname}
-                  onChange={handleInputChange}
-                />
-                <div className="mb-3">
-                  <select
-                    name="position"
-                    className="form-control"
-                    value={newEmployee.position}
-                    onChange={handleInputChange}
-                    required
-                  >
-                    <option value="">Seleccione una posición</option>
-                    {positions.map((position) => (
-                      <option key={position} value={position}>
-                        {position}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <input
-                  type="date"
-                  name="birthdate"
-                  className="form-control mb-2"
-                  placeholder="Fecha de Nacimiento"
-                  value={newEmployee.birthdate}
-                  onChange={handleInputChange}
-                />
-                  {error && <div className="alert alert-danger">{error}</div>}
-                <button className="btn btn-success" onClick={handleAddEmployee}>
-                  Añadir
-                </button>
-              </div>
-            </div>
+            <AddEmployeeForm
+              users={users}
+              positions={positions}
+              newEmployee={newEmployee}
+              selectedUser={selectedUser}
+              handleInputChange={handleInputChange}
+              handleUserChange={handleUserChange}
+              handleAddEmployee={handleAddEmployee}
+              error={error}
+              loading={loading}
+            />
           )}
         </div>
       </div>

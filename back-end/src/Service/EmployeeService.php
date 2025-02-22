@@ -29,10 +29,10 @@ class EmployeeService
 
     public function registerEmployee(array $data, $currentUser): JsonResponse
     {
+
         if (!$this->isValidEmployeeData($data)) {
             return new JsonResponse(['error' => 'Datos incompletos o puesto de trabajo no válido'], JsonResponse::HTTP_BAD_REQUEST);
         }
-
         $user = $this->getUserForEmployee($data, $currentUser);
         if ($user instanceof JsonResponse) {
             return $user;
@@ -139,7 +139,8 @@ class EmployeeService
     private function isValidEmployeeData(array $data): bool
     {
         return isset($data['name'], $data['lastname'], $data['position'], $data['birthdate']) &&
-               $this->positionService->isValidPosition($data['position']);
+            !empty($data['name']) && !empty($data['lastname']) && !empty($data['position']) && !empty($data['birthdate']) &&
+            $this->positionService->isValidPosition($data['position']);
     }
 
     private function getUserForEmployee(array $data, $currentUser)

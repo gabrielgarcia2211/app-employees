@@ -2,12 +2,13 @@ import axios from "axios";
 
 const API_URL = process.env.REACT_APP_API_URL;
 
-export const getEmployees = async () => {
+export const getEmployees = async (name) => {
   const token = localStorage.getItem("token");
   const response = await axios.get(`${API_URL}/employees`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
+    params: name ? { name } : {},
   });
   return response.data;
 };
