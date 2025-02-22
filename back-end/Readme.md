@@ -72,3 +72,7 @@ Para hacer peticiones autenticadas, se debe incluir el token en el encabezado `A
 ```bash
 Authorization: Bearer {token}
 ```
+
+## 📄 Licencia
+
+Este proyecto está bajo la Licencia MIT. Consulta el archivo [LICENSE](LICENSE) para más detalles.
