@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-import Swal from "sweetalert2";
+import React, { useState } from "react";
 import { login } from "../../api/authService";
 import { Link } from "react-router-dom";
 import "../../styles/login.css";
@@ -9,25 +8,14 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    if (localStorage.getItem("token")) {
-      window.location.href = "/dashboard";
-    }
-  }, []);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     try {
       const response = await login(email, password);
       localStorage.setItem("token", response.data.token);
-      Swal.fire(
-        "Login exitoso",
-        "Has iniciado sesión correctamente",
-        "success"
-      );
+      window.location.href = "/dashboard";
     } catch (error) {
-      console.error(error);
       setError("Credenciales incorrectas");
     }
   };
@@ -35,7 +23,7 @@ const Login = () => {
   return (
     <div
       className="card container mt-5 p-4 shadow-lg"
-      style={{ maxWidth: "400px", width: "100%" }}
+      style={{ maxWidth: "400px", width: "100%", position: "relative" }}
     >
       <img src="/logo.png" className="img-fluid mt-3 logo-img" />
       <h2 className="text-center mb-3">Iniciar Sesión</h2>

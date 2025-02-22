@@ -2,8 +2,6 @@
 
 namespace App\Controller;
 
-use App\Service\PositionService;
-use App\Repository\EmployeeRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;

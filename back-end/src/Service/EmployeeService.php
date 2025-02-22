@@ -58,7 +58,8 @@ class EmployeeService
             'name' => $employee->getName(),
             'lastname' => $employee->getLastname(),
             'position' => $employee->getPosition(),
-            'email' => $employee->getUser()->getEmail()
+            'birthdate' => $employee->getBirthdate() ? $employee->getBirthdate()->format('Y-m-d') : null,
+            'email' => $employee->getUser() ? $employee->getUser()->getEmail() : null
         ], $employees);
 
         return new JsonResponse($data);

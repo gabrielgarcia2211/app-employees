@@ -3,7 +3,8 @@ import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import { register } from "../../api/authService";
 import { getPositions } from "../../api/positionService";
-import Spinner from "../Layout/Spinner"; // Importar el componente Spinner
+import Spinner from "../Layout/Spinner";
+import { handleError } from "../../utils/errorHandler"; // Importar la función handleError
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -53,10 +54,7 @@ const Register = () => {
         position: "",
       });
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.error ||
-        error.message ||
-        "Error al registrar el usuario";
+      const errorMessage = handleError(error, "Error al registrar el usuario");
       setError(errorMessage);
     } finally {
       setLoading(false);
