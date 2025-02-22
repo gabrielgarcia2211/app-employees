@@ -22,3 +22,13 @@ export const addEmployee = async (employee) => {
   });
   return response.data;
 };
+
+export const editEmployeeName = async (id, name) => {
+  const token = localStorage.getItem("token");
+  const response = await axios.put(`${API_URL}/employees/${id}/name`, { name }, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};

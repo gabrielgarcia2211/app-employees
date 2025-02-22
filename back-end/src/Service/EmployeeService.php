@@ -145,11 +145,11 @@ class EmployeeService
 
     private function getUserForEmployee(array $data, $currentUser)
     {
-        if ($currentUser->isGranted('ROLE_ADMIN') && !isset($data['user_id'])) {
+        if ($currentUser->isGranted('ROLE_ADMIN') && empty($data['user_id'])) {
             return null;
         }
 
-        if (!isset($data['user_id'])) {
+        if (empty($data['user_id'])) {
             return new JsonResponse(['error' => 'user_id es requerido para roles no administradores'], JsonResponse::HTTP_BAD_REQUEST);
         }
 

@@ -6,3 +6,21 @@
   border-radius: 4px;
   font-size: 16px;
 }
+
+.table-input {
+  width: 100%;
+  padding: 5px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.table-input:hover {
+  border-color: #ccc;
+}
+
+.table-input:focus {
+  border-color: #66afe9;
+  outline: none;
+}
