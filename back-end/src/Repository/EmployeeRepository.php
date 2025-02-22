@@ -24,4 +24,13 @@ class EmployeeRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function searchByUserId(int $id)
+    {
+        return $this->createQueryBuilder('e')
+            ->where('e.user = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }

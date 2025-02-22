@@ -65,6 +65,26 @@ class EmployeeService
         return new JsonResponse($data);
     }
 
+    public function getEmploye($currentUser): JsonResponse
+    {
+        $employee = $this->employeeRepository->searchByUserId($currentUser->getId());
+
+        if (!$employee) {
+            return new JsonResponse(['error' => 'Empleado no encontrado'], JsonResponse::HTTP_NOT_FOUND);
+        }
+
+        $data = [
+            'id' => $employee->getId(),
+            'name' => $employee->getName(),
+            'lastname' => $employee->getLastname(),
+            'position' => $employee->getPosition(),
+            'birthdate' => $employee->getBirthdate() ? $employee->getBirthdate()->format('Y-m-d') : null,
+            'email' => $employee->getUser() ? $employee->getUser()->getEmail() : null
+        ];
+
+        return new JsonResponse($data);
+    }
+
     public function getPositions(PositionService $positionService): JsonResponse
     {
         try {

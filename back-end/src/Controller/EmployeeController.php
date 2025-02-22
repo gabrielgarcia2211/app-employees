@@ -27,6 +27,13 @@ class EmployeeController extends AbstractController
         return $this->employeeService->getEmployees($name);
     }
 
+    #[Route('/employe', name: 'get_employe', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
+    public function getEmploye(): JsonResponse
+    {
+        return $this->employeeService->getEmploye($this->getUser());
+    }
+
     #[Route('/employees', name: 'register_employee', methods: ['POST'])]
     public function registerEmployee(Request $request): JsonResponse
     {

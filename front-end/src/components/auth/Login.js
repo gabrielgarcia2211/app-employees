@@ -14,7 +14,13 @@ const Login = () => {
     try {
       const response = await login(email, password);
       localStorage.setItem("token", response.data.token);
-      window.location.href = "/dashboard";
+      localStorage.setItem("roles", JSON.stringify(response.data.user.roles));
+      const userRoles = response.data.user.roles;
+      if (userRoles.includes("ROLE_ADMIN")) {
+        window.location.href = "/dashboard";
+      } else if (userRoles.includes("ROLE_USER")) {
+        window.location.href = "/perfil";
+      }
     } catch (error) {
       setError("Credenciales incorrectas");
     }

@@ -32,3 +32,23 @@ export const editEmployeeName = async (id, name) => {
   });
   return response.data;
 };
+
+export const editEmployeePosition = async (id, position) => {
+  const token = localStorage.getItem("token");
+  const response = await axios.put(`${API_URL}/employees/${id}/position`, { position }, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};
+
+export const deleteEmployee = async (id) => {
+  const token = localStorage.getItem("token");
+  const response = await axios.delete(`${API_URL}/employees/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};

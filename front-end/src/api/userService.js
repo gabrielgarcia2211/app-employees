@@ -11,3 +11,13 @@ export const getUsers = async () => {
   });
   return response.data;
 };
+
+export const getUserInfo = async () => {
+  const token = localStorage.getItem("token");
+  const response = await axios.get(`${API_URL}/employe`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};
