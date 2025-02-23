@@ -45,6 +45,34 @@ Este proyecto utiliza Symfony 6.4 junto con JWT Authentication para la gestión 
     symfony server
     ```
 
+## Pruebas Integrales
+
+Para ejecutar pruebas integrales, es necesario configurar una base de datos de pruebas y ejecutar los comandos correspondientes.
+
+### Configuración de la Base de Datos de Pruebas
+
+1. Crear la base de datos de pruebas:
+    ```bash
+    php bin/console doctrine:database:create --env=test
+    ```
+
+2. Ejecutar las migraciones en la base de datos de pruebas:
+    ```bash
+    php bin/console doctrine:migrations:migrate --env=test
+    ```
+
+3. Cargar los fixtures en la base de datos de pruebas:
+    ```bash
+    php bin/console doctrine:fixtures:load --env=test
+    ```
+
+### Ejecución de Pruebas
+
+Para ejecutar las pruebas, utiliza el siguiente comando:
+```bash
+php bin/phpunit
+```
+
 ## Rutas de la API
 
 ### Autenticación 🔐
