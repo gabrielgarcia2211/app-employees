@@ -270,7 +270,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"email\": \"garciaquinteroga@gmail.com\",\r\n    \"lastname\": \"garcia\",\r\n    \"name\": \"gabriel\",\r\n    \"password\": \"gabriel\",\r\n    \"position\": \"help desk\"\r\n}",
+							"raw": "{\r\n    \"email\": \"garciaquinteroga@gmail.com\",\r\n    \"lastname\": \"garcia\",\r\n    \"name\": \"gabriel\",\r\n    \"password\": \"gabriel\",\r\n    \"position\": \"help desk\",\r\n    \"birthdate\": \"2021-01-23\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
