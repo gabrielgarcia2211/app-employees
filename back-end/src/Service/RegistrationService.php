@@ -35,7 +35,7 @@ class RegistrationService
         }
 
         if ($this->userExists($data['email'])) {
-            return new JsonResponse(['error' => 'El usuario ya existe'], JsonResponse::HTTP_BAD_REQUEST);
+            return new JsonResponse(['error' => 'El usuario eamil ya existe'], JsonResponse::HTTP_BAD_REQUEST);
         }
 
         if (!$this->positionService->isValidPosition($data['position'])) {
@@ -66,8 +66,8 @@ class RegistrationService
 
     private function isValidRegistrationData(?array $data): bool
     {
-        return isset($data['email'], $data['password'], $data['name'], $data['lastname'], $data['position']) &&
-               !empty($data['email']) && !empty($data['password']) && !empty($data['name']) && !empty($data['lastname']) && !empty($data['position']);
+        return isset($data['email'], $data['password'], $data['name'], $data['lastname'], $data['position'], $data['birthdate']) &&
+               !empty($data['email']) && !empty($data['password']) && !empty($data['name']) && !empty($data['lastname']) && !empty($data['position'] && !empty($data['birthdate']));
     }
 
     private function userExists(string $email): bool

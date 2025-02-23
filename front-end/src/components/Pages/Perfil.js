@@ -60,7 +60,7 @@ const Perfil = () => {
       setError("");
       setLoading(true);
       const { id } = userInfo;
-      Swal.fire({
+      const result = await Swal.fire({
         title: "¿Deseas eliminar la información?",
         showCancelButton: true,
         confirmButtonText: "Eliminar",
@@ -70,17 +70,17 @@ const Perfil = () => {
           confirmButton: "btn btn-primary me-2",
           cancelButton: "btn btn-secondary",
         },
-      }).then(async (result) => {
-        if (result.isConfirmed) {
-          await deleteEmployee(id);
-          Toast.fire({
-            icon: "success",
-            title: "Información eliminada correctamente",
-          });
-        }
       });
 
-      fetchUserInfo();
+      if (result.isConfirmed) {
+        await deleteEmployee(id);
+        Toast.fire({
+          icon: "success",
+          title: "Información eliminada correctamente",
+        });
+        setUserInfo(null);
+        setPositions([]);
+      }
     } catch (error) {
       const errorMessage = handleError(error, "Error al eliminar el usuario");
       setError(errorMessage);
@@ -102,7 +102,7 @@ const Perfil = () => {
               <input
                 type="text"
                 className="form-control"
-                value={userInfo?.name}
+                value={userInfo?.name ?? ""}
                 readOnly
                 disabled
               />
@@ -112,7 +112,7 @@ const Perfil = () => {
               <input
                 type="text"
                 className="form-control"
-                value={userInfo?.lastname}
+                value={userInfo?.lastname ?? ""}
                 readOnly
                 disabled
               />
@@ -122,7 +122,7 @@ const Perfil = () => {
               <input
                 type="email"
                 className="form-control"
-                value={userInfo?.email}
+                value={userInfo?.email ?? ""}
                 readOnly
                 disabled
               />
@@ -131,7 +131,7 @@ const Perfil = () => {
               <label className="form-label">Posición:</label>
               <select
                 className="form-control"
-                value={userInfo?.position}
+                value={userInfo?.position ?? ""}
                 onChange={handlePositionChange}
               >
                 {positions.map((position) => (
@@ -146,7 +146,7 @@ const Perfil = () => {
               <input
                 type="text"
                 className="form-control"
-                value={userInfo?.birthdate}
+                value={userInfo?.birthdate ?? ""}
                 readOnly
                 disabled
               />

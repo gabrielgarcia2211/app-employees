@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
-import { register } from "../../api/authService";
+import { register, login } from "../../api/authService"; // Importar la función login
 import { getPositions } from "../../api/positionService";
 import Spinner from "../Layout/Spinner";
-import { handleError } from "../../utils/errorHandler"; // Importar la función handleError
+import { handleError } from "../../utils/errorHandler";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -13,6 +13,7 @@ const Register = () => {
     name: "",
     lastname: "",
     position: "",
+    birthdate: "",
   });
   const [error, setError] = useState("");
   const [positions, setPositions] = useState([]);
@@ -45,14 +46,25 @@ const Register = () => {
     setLoading(true);
     try {
       const response = await register(formData);
-      Swal.fire("Login exitoso", response.data.message, "success");
+      Swal.fire("Registro exitoso", response.data.message, "success");
       setFormData({
         email: "",
         password: "",
         name: "",
         lastname: "",
         position: "",
+        birthdate: "",
       });
+      // Iniciar sesión automáticamente después del registro exitoso
+      const loginResponse = await login(formData.email, formData.password);
+      localStorage.setItem("token", loginResponse.data.token);
+      localStorage.setItem("roles", JSON.stringify(loginResponse.data.user.roles));
+      const userRoles = loginResponse.data.user.roles;
+      if (userRoles.includes("ROLE_ADMIN")) {
+        window.location.href = "/dashboard";
+      } else if (userRoles.includes("ROLE_USER")) {
+        window.location.href = "/perfil";
+      }
     } catch (error) {
       const errorMessage = handleError(error, "Error al registrar el usuario");
       setError(errorMessage);
@@ -131,6 +143,17 @@ const Register = () => {
               </option>
             ))}
           </select>
+        </div>
+        <div className="mb-3">
+          <label className="form-label">Fecha de Nacimiento:</label>
+          <input
+            type="date"
+            name="birthdate"
+            className="form-control"
+            value={formData.birthdate}
+            onChange={handleChange}
+            required
+          />
         </div>
         <button type="submit" className="btn btn-primary">
           Registrarse

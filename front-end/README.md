@@ -31,7 +31,7 @@ npm install
 
 ### 3️⃣ Ejecutar el Proyecto en Modo Desarrollo
 ```bash
-npm run dev
+npm start
 ```
 
 El proyecto se iniciará en `http://localhost:3000/` (por defecto).
