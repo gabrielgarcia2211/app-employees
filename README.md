@@ -30,6 +30,12 @@ El back-end utiliza **Symfony 6.4** junto con **JWT Authentication** para la ges
 
 Para más detalles, consulta el [README del Back-end](./back-end/README.md).
 
+## Diagrama del Proyecto
+
+A continuación se muestra un diagrama que ilustra la arquitectura del proyecto:
+
+![Diagrama del Proyecto](./assets/diagrama.png)
+
 ## 📄 Licencia
 
 Este proyecto está bajo la Licencia MIT. Consulta el archivo [LICENSE](LICENSE) para más detalles.
