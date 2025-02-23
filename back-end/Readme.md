@@ -1,4 +1,4 @@
-# Proyecto Symfony 6.4 con JWT
+# Back-end
 
 ![Symfony](https://img.shields.io/badge/Symfony-6.4-black?style=for-the-badge&logo=symfony)
 ![PHP](https://img.shields.io/badge/PHP-8.1%2B-blue?style=for-the-badge&logo=php)
@@ -42,7 +42,7 @@ Este proyecto utiliza Symfony 6.4 junto con JWT Authentication para la gestión 
 
 6. Inicia el servidor de desarrollo de Symfony:
     ```bash
-    symfony server:start
+    symfony server
     ```
 
 ## Rutas de la API

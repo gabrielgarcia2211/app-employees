@@ -1,4 +1,9 @@
-# Proyecto React 19 con SweetAlert2, Axios y Bootstrap
+# Front-end
+
+![React](https://img.shields.io/badge/React-19-blue?style=for-the-badge&logo=react)
+![SweetAlert2](https://img.shields.io/badge/SweetAlert2-Interactive%20Alerts-green?style=for-the-badge&logo=sweetalert)
+![Axios](https://img.shields.io/badge/Axios-HTTP%20Client-orange?style=for-the-badge&logo=axios)
+![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3.3-purple?style=for-the-badge&logo=bootstrap)
 
 Este es un proyecto basado en **React 19** que utiliza **SweetAlert2** para alertas interactivas, **Axios** para el manejo de peticiones HTTP y **Bootstrap 5** para estilos y diseño responsivo.
 
@@ -51,7 +56,6 @@ app-employees/
 - 📋 **Gestión de Empleados**: Añadir, editar y eliminar empleados.
 - 🔍 **Búsqueda y Filtrado**: Buscar empleados por nombre.
 - 🔐 **Login y Registro**: Autenticación de usuarios y creación de nuevas cuentas.
-
 
 ## 📄 Licencia
 
